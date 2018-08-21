@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <Servo.h>
+#include <assert.h>
 #include "Time.h"
 
 Servo myservo1;
@@ -10,14 +11,62 @@ Servo myservo4;
 Servo myservo5;
 Servo myservo6;
 
-int angle1;
-int angle2;
-int angle3;
-int angle4;
-int angle5;
-int angle6;
+bool newData = false;
+int angles[6] = {0,0,0,0,0,0} ;
 
-int angles[6];
+void comma_sep_parser(char *line){
+    // Takes in a char*, converts char* to int, comma separated
+    Serial.println("entering parser");
+    const char *delim = ",";
+    char *p = strtok(line, delim);
+    int counter = 0;
+    while (p != NULL){
+        // convert *p to int, store into angles[counter]
+        angles[counter] = atoi(p);
+        // fetch next one
+        p = strtok(NULL, delim);
+        counter++;
+    }
+    assert(counter==6);
+   
+    Serial.println(angles[0]);
+    Serial.println(angles[1]);
+    Serial.println(angles[2]);
+    Serial.println(angles[3]);
+    Serial.println(angles[4]);
+    Serial.println(angles[5]); 
+}
+
+void recv(){
+    char buffer[30];
+    byte ndx=0;
+    char character;
+    char endMarker = '\n';
+    bool keepReading = true;
+    while (Serial.available() && keepReading){
+        Serial.println("reading");
+        character = Serial.read();
+        if (character != endMarker){
+            buffer[ndx] = character;
+            ndx++;
+        }
+        else{
+            //null terminate the string
+            buffer[ndx] = '\0';
+            keepReading = false;
+            newData = true;
+        }
+    }
+    if (newData){
+      Serial.println("Read %s from serial:");
+      Serial.println(buffer);
+      Serial.println("parsing");
+      comma_sep_parser(buffer);
+    }
+ 
+    // pass string through parser, updating global variable
+    newData = false;
+}
 
 void setup() {
   // put your setup code here, to run once:
@@ -31,48 +80,24 @@ void setup() {
 }
 
 void loop() {
-  target = myservo1
-    
-// read the Serial input, allocate to each of the servos
-
-  for (int i = 30 ; i < 120; i++){
-    myservo1.write(i);
-    myservo2.write(20);
-    myservo3.write(i);
-    myservo4.write(i);
-    myservo5.write(i);
-    myservo6.write(i);
-    Serial.println(i);
-    delay(25);
-  }
-
-  for (int i = 120; i>30; i--){
-    myservo1.write(i);
-    myservo2.write(20);
-    myservo3.write(i);
-    myservo4.write(i);
-    myservo5.write(i);
-    myservo6.write(i);
-    Serial.println(i);
-    delay(25);
-  }
-// send Serial output, joint angles positions.
-
+    recv();
+    Serial.println("out");
+    myservo1.write(angles[0]);
+    myservo2.write(angles[1]);
+    myservo3.write(angles[2]);
+    myservo4.write(angles[3]);
+    myservo5.write(angles[4]);
+    myservo6.write(angles[5]);
+    // Serial.println("Wrote to servos %d, %d, %d, %d, %d, %d",
+    //                 angles[0], angles[1], angles[2], angles[3], 
+    //                 angles[4], angles[5]);
+    Serial.println(angles[0]);
+    Serial.println(angles[1]);
+    Serial.println(angles[2]);
+    Serial.println(angles[3]);
+    Serial.println(angles[4]);
+    Serial.println(angles[5]);
+    delay(1000);
 }
 
-
-void parser(char *line){
-    // Takes in a char*, converts char* to int, comma separated
-    const char *delim = ',';
-    char *p = strtok(line, delim);
-    int counter = 0;
-    while (p != NULL){
-        // convert *p to int, store into angles[counter]
-        angles[counter] = atoi(p);
-        // fetch next one
-        p = strtok(NULL, delim);
-        counter ++;
-    }
-    assert(counter==6);
-}
 
