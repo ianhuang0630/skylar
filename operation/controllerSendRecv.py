@@ -11,12 +11,14 @@ import time
 WAIT_MILLIS = 10
 
 def angle_string_maker(angle_list):
-    return ','.join(angle_list)
+    return ','.join([str(element) for element in angle_list])
 def angle_string_parser(angle_line):
-    data = [int(element.strip()) for element in data_line.split(',')]
+    assert isinstance(angle_line, str), 'input must be string, currently {}.'.\
+            format(type(angle_line))
+    data = [int(element.strip()) for element in angle_line.split(',')]
     return data
 
-def send(angle_vec, serial_port):
+def send(angle_vec, serial_port, ang_str_encoder=angle_string_maker):
     """ Function to send a vector of angles to the arduino
     Args:
         angle_vec: list or numpy array of the joint angles
@@ -29,7 +31,7 @@ def send(angle_vec, serial_port):
             not isinstance(angle_vec, tuple):
         raise ValueError("Sent angles not formatted in the correct way")
     # sending the angle to serial_port 
-    send_string = angle_string_maker(angle_vec)
+    send_string = ang_str_encoder(angle_vec)
     try:
         serial_port.write(send_string)
     except:
@@ -42,7 +44,7 @@ def send(angle_vec, serial_port):
     else:
         return False 
 
-def recv(serial_port, verbose=False, delimiter=','):
+def recv(serial_port, verbose=False, delimiter=',', ang_str_decoder=angle_string_parser):
     """ Function to receive a string of comma separated angles
     args:
         serial_port: the serial port
@@ -52,19 +54,18 @@ def recv(serial_port, verbose=False, delimiter=','):
     Returns:
         recv_angles: the list/tuple/array of serial_received
     """
-    try:
-        data_line = serial_port.readline()
-    except:
-        raise IOError('Unable to read line from the serial port')
+    data_line = serial_port.readline()
     # parsing the data_line
     try:
-        data = angle_string_parser(data_line)
+        data = ang_str_decoder(data_line)
     except:
         raise ValueError('Unable to convert to list of angles.')
+    
     if verbose:
         # get time
-	t = time.strftime("%Y-%m-%d-%H.%M.%S", time.localtime())
+        t = time.strftime("%Y-%m-%d-%H.%M.%S", time.localtime())
         print('Received angles at {}: {}'.format(t, data_line))
+    
     return data
 
 def validate(sent_angles, recv_angles):
