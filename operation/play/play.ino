@@ -81,22 +81,28 @@ void setup() {
 
 void loop() {
     recv();
-    Serial.println("out");
+    // will send a confirmation of angles parsed
+    Serial.print(angles[0]);
+    Serial.print(", ");
+    Serial.print(angles[1]);
+    Serial.print(", ");
+    Serial.print(angles[2]);
+    Serial.print(", ");
+    Serial.print(angles[3]);
+    Serial.print(", ");
+    Serial.print(angles[4]);
+    Serial.print(", ");
+    Serial.println(angles[5]);
+    // TODO: waiting for validation for go ahead from raspberry pi
+    // otherwise retry to recv.
+
     myservo1.write(angles[0]);
     myservo2.write(angles[1]);
     myservo3.write(angles[2]);
     myservo4.write(angles[3]);
     myservo5.write(angles[4]);
     myservo6.write(angles[5]);
-    // Serial.println("Wrote to servos %d, %d, %d, %d, %d, %d",
-    //                 angles[0], angles[1], angles[2], angles[3], 
-    //                 angles[4], angles[5]);
-    Serial.println(angles[0]);
-    Serial.println(angles[1]);
-    Serial.println(angles[2]);
-    Serial.println(angles[3]);
-    Serial.println(angles[4]);
-    Serial.println(angles[5]);
+   
     delay(1000);
 }
 
