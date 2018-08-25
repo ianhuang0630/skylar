@@ -47,7 +47,7 @@ class TestControllerSendRecv(unittest.TestCase):
         port.data = [12, 13, 14, 15, 16, 17]
         recved = recv(port, ang_str_decoder=angle_string_parser)
         self.assertEqual(port.data, recved,
-                msg='Test for recv failed: {} and {} do not match.'.\
+                    msg='Test for recv failed: {} and {} do not match.'.\
                     format(port.data, recved))
 
 if __name__=='__main__':
