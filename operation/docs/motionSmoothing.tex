@@ -1,0 +1,63 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{comment}
+
+\title{Motion smoothing for Skylar}
+\author{Ian Huang}
+\date{\today}
+
+\begin{document}
+\maketitle
+\section{Introduction}
+One of the earlier mistakes made was not accounting for the variable amounts of
+current draw in the circuits when falsely parsed commands were given to the
+arduino. On one occasion, this actually caused one all of the servos to fail,
+and possibly one of the PWM pins on the arduino. To remedy this, I plan to
+smooth the motion of the robot.
+
+The smoothing will be parabolic, and will have the form:\\
+$$\omega(t)= at^2 + bt + c$$
+From this, given $\tau$, the time period in which we'd like all of the joints
+to transition to their next state ($\theta_1$ and $\theta_1'$ stand for the 
+prior and post-transition joint angles of the first joint), we would like to
+find a formula for $theta_i(t)$ for every joint $i$.
+
+\section{Derivations}
+% some more math
+We know that \\
+1. $\int_{0}^{\tau}\omega_i(t) dt = \theta_i' - \theta_i$\\
+2. $\omega_i(0) = 0$ \\
+3. $\omega_i(\tau) = 0$\\
+
+This allows us to solve for $a_i$, $b_i$, and $c_i$ in terms of $\tau$, 
+$\theta_i$, and $\theta_i'$. It becomes apparent that $c = 0$ from the 2nd
+condition.
+
+Expanding the integral in the first condition, we get:
+$$\biggr[ \frac{1}{3}a_it^3 + \frac{1}{2}b_it^2 \biggr|^\tau_0 = \Delta \theta_i$$
+Plugging in $\tau$ to the third condition, we get:
+$$a\tau^2 + b\tau = 0$$
+$$b = -a\tau$$
+Plugging this into the expanded first condition:
+$$\frac{1}{3}a\tau^3 + \frac{1}{2}(-a\tau)\tau^2 = \Delta \theta_i$$
+$$a = \frac{-6(\theta_i' - \theta_i)}{\tau^3}$$
+Since we know that:
+$$b=-a\tau$$
+we can solve for b:
+$$b = \frac{6(\theta_i' - \theta_i)}{\tau^2}$$
+To solve for $\theta_i(t)$, we have:
+$$\theta_i(t) = \int \biggr( \frac{-6(\theta_i' - \theta_i)}{\tau^3} t^2 + \frac{-6(\theta_i' - \theta_i)}{\tau^3} t \biggr) dt $$
+$$\theta_i(t) = \frac{-2(\theta_i'-\theta_i)}{\tau^3} t^3 + \frac{3(\theta_i' - \theta_i)}{\tau^2} t^2 + C$$
+We solve for the integration constant at $t = 0$,
+$$\theta_i(0) = C = \theta_i $$
+Therefore, for prior angle vector $\Theta$, destination angle vector
+$\Theta'$ and time duration $\tau$, we can calculate the coefficients in the
+equation for $\theta(t) = \alpha t^3 + \beta t^2 + C$, in vectorized form. \\
+$$\alpha = \frac{-2}{\tau^3}(\Theta' - \Theta)$$
+$$\beta = \frac{3}{\tau^2}(\Theta' - \Theta)$$
+$$C = \Theta$$
+
+\section{End Result}
+% Photos of end result? How well does it work
+
+\end{document}
