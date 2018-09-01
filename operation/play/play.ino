@@ -103,7 +103,7 @@ void loop() {
     myservo5.write(angles[4]);
     myservo6.write(angles[5]);
    
-    delay(1000);
+    delay(5);
 }
 
 
