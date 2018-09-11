@@ -3,9 +3,8 @@
 
 This is the unit test for the motion interface.
 """
-
-
 import unittest
+from test_controllerSendRecv import TesterPort
 
 class TestAngleCommander(unittest.TestCase):
     def test_get_initial_state(self):
